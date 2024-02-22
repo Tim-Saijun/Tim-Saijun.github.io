@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/avatar.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/avatar.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/avatar.png">
+  <link rel="mask-icon" href="/img/avatar.png" color="#222">
+  <meta name="baidu-site-verification" content="codeva-ljr52U8lOC">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"s.zair.top","root":"/","images":"/images","scheme":"Pisces","darkmode":"auto","version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":true,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="介绍长截图自动分割工具Web-page-Screenshot-Segmentation的开发背景、工作原理以及使用方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网页长截图自动分割工具">
+<meta property="og:url" content="https://s.zair.top/post/Web-page-Screenshot-Segmentation">
+<meta property="og:site_name" content="以太工坊">
+<meta property="og:description" content="介绍长截图自动分割工具Web-page-Screenshot-Segmentation的开发背景、工作原理以及使用方法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Tim-Saijun/Web-page-Screenshot-Segmentation/main/images/demo.png">
+<meta property="article:published_time" content="2024-02-06T03:29:01.000Z">
+<meta property="article:modified_time" content="2024-02-22T03:52:12.271Z">
+<meta property="article:author" content="Tim">
+<meta property="article:tag" content="代码工具">
+<meta property="article:tag" content="OpenCV">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Tim-Saijun/Web-page-Screenshot-Segmentation/main/images/demo.png">
+
+
+<link rel="canonical" href="https://s.zair.top/post/Web-page-Screenshot-Segmentation.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://s.zair.top/post/Web-page-Screenshot-Segmentation","path":"/post/Web-page-Screenshot-Segmentation.html","title":"网页长截图自动分割工具"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>网页长截图自动分割工具 | 以太工坊</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?5e5c8e78bcbcec96b8795ab83fc501b0"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="以太工坊" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">以太工坊</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">以太工坊</p>
+      <img class="custom-logo-image" src="/img/avatar.png" alt="以太工坊">
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-标准版"><a href="https://www.zair.top/" rel="section" target="_blank"><i class="fa fa-sitemap fa-fw"></i>标准版</a></li><li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8"><span class="nav-text">开始使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-text">安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%AD%E4%BD%BF%E7%94%A8"><span class="nav-text">在命令行中使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E5%9B%BE%E5%83%8F%E4%B8%AD%E7%94%BB%E5%87%BA%E5%88%86%E5%89%B2%E7%BA%BF"><span class="nav-text">在图像中画出分割线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E5%88%86%E5%9B%BE%E5%83%8F"><span class="nav-text">切分图像</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E6%BA%90%E7%A0%81%E4%BD%BF%E7%94%A8"><span class="nav-text">从源码使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#split-heights-%E5%87%BD%E6%95%B0"><span class="nav-text">split_heights 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95"><span class="nav-text">示例用法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#draw-line-from-file-%E5%87%BD%E6%95%B0"><span class="nav-text">draw_line_from_file 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95-1"><span class="nav-text">示例用法</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tim</p>
+  <div class="site-description" itemprop="description">分享我的学习笔记、经验与有趣的小玩意.<br></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tim-Saijun" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tim-Saijun" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yangzair@outlook.com" title="E-Mail → mailto:yangzair@outlook.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/tim_run" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;tim_run" rel="noopener me" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zair.top/" title="标准版 → https:&#x2F;&#x2F;www.zair.top" rel="noopener me" target="_blank"><i class="fa fa-globe fa-fw"></i>标准版</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://s.zair.top/post/Web-page-Screenshot-Segmentation">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tim">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="以太工坊">
+      <meta itemprop="description" content="分享我的学习笔记、经验与有趣的小玩意.<br>">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="网页长截图自动分割工具 | 以太工坊">
+      <meta itemprop="description" content="介绍长截图自动分割工具Web-page-Screenshot-Segmentation的开发背景、工作原理以及使用方法。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网页长截图自动分割工具
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-06 11:29:01" itemprop="dateCreated datePublished" datetime="2024-02-06T11:29:01+08:00">2024-02-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-22 11:52:12" itemprop="dateModified" datetime="2024-02-22T11:52:12+08:00">2024-02-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
+        </span>
+    </span>
+
+  
+    <span id="/post/Web-page-Screenshot-Segmentation" class="post-meta-item twikoo_visitors" data-flag-title="网页长截图自动分割工具" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="twikoo_visitors"></span>
+    </span>
+  
+</div>
+
+            <div class="post-description">介绍长截图自动分割工具Web-page-Screenshot-Segmentation的开发背景、工作原理以及使用方法。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>当需要分享或分析网页内容时，长截图是一种非常实用的形式，它能够完整地展示页面。然而，处理这些长截图时，如何保持其信息的完整性和可读性，同时方便进行后续操作，一直是一个挑战。比如目前（2024年初）市面上主流的AI图像模型，仍然不能处理很大、很复杂的图片，如果强行把一张长截图输入模型，就会导致模型输出的性能变差（很多细节无法被识别到）。为了解决这个问题，我开发了一款基于OpenCV的工具，旨在简化长截图的处理过程，同时保持其内容的完整性和可读性。</p>
+<p>这个项目已在我的Github开源：<a target="_blank" rel="noopener" href="https://github.com/Tim-Saijun/Web-page-Screenshot-Segmentation">https://github.com/Tim-Saijun/Web-page-Screenshot-Segmentation</a></p>
+<p>与许多现有的工具或方法不同，Web-page-Screenshot-Segmentation采用了OpenCV自动地识别和遵循网页内容的自然分隔线，自动找到最合适的分割点。也就是说无论是标题、段落还是图表，都能够被整齐地保留在分割后的图片中，不会出现内容断裂或遗漏的情况。</p>
+<p>使用Web-page-Screenshot-Segmentation非常简单，只需准备一张长截图，工具便会自动分析图片内容，并智能决定分割点。最终将获得一系列完整且结构化良好的图片，方便进行分享和进一步处理。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>该项目用于根据文本的高度将网页的长截图分割成几个部分。主要思想是找到图像的低变化区域，然后在低变化区域中找到分割线。<br><img src="https://raw.githubusercontent.com/Tim-Saijun/Web-page-Screenshot-Segmentation/main/images/demo.png" alt="红线是分割线"><br>输出的是网页的小而完整的图像，可以用于使用<a target="_blank" rel="noopener" href="https://github.com/abi/screenshot-to-code">Screen-to-code</a>生成网页或训练模型。<br>更多结果可以在<a href="images">images</a>目录中找到。</p>
+<h2 id="开始使用"><a href="#开始使用" class="headerlink" title="开始使用"></a>开始使用</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><pre class="line-numbers language-none"><code class="language-none">pip install Web-page-Screenshot-Segmentation</code></pre>
+
+<h2 id="在命令行中使用"><a href="#在命令行中使用" class="headerlink" title="在命令行中使用"></a>在命令行中使用</h2><p>获取图像的分割线的高度</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">python -m Web_page_Screenshot_Segmentation.master -f &quot;path&#x2F;to&#x2F;img&quot;</code></pre>
+<p>输出应该是个列表:<code>[6, 868, 1912, 2672, 3568, 4444, 5124, 6036, 7698]</code>。它是图像分割线的高度列表。<br>如果你想在图中显示这条分割线，可以加上<code> -s True</code>参数：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">python -m Web_page_Screenshot_Segmentation.master -f &quot;path&#x2F;to&#x2F;img&quot; -s True</code></pre>
+
+<h3 id="在图像中画出分割线"><a href="#在图像中画出分割线" class="headerlink" title="在图像中画出分割线"></a>在图像中画出分割线</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">python -m Web_page_Screenshot_Segmentation.drawer --image_file path&#x2F;to&#x2F;image.jpg --hl [100,200] --color (0,255,0)</code></pre>
+
+<h3 id="切分图像"><a href="#切分图像" class="headerlink" title="切分图像"></a>切分图像</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">python -m Web_page_Screenshot_Segmentation.spliter --f path&#x2F;to&#x2F;image.jpg -ht &quot;[233,456]&quot;</code></pre>
+<p>你将得到分割图像，保存在命令返回的路径中。</p>
+<p>更多用法解释请参照帮助：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">python master.py --help
+python spliter.py --help</code></pre>
+
+<h2 id="从源码使用"><a href="#从源码使用" class="headerlink" title="从源码使用"></a>从源码使用</h2><h3 id="split-heights-函数"><a href="#split-heights-函数" class="headerlink" title="split_heights 函数"></a>split_heights 函数</h3><p><code>split_heights</code> 函数用于根据各种阈值将图像分割成几个部分。它接受以下参数：</p>
+<ul>
+<li><code>file_path</code>: 图像文件的路径。</li>
+<li><code>split</code>: 一个布尔值，指示是否分割图像。</li>
+<li><code>height_threshold</code>: 低变化区域的高度阈值。</li>
+<li><code>variation_threshold</code>: 低变化区域的变化阈值。</li>
+<li><code>color_threshold</code>: 颜色差异的阈值。</li>
+<li><code>color_variation_threshold</code>: 颜色差异变化的阈值。</li>
+<li><code>merge_threshold</code>: 两条线之间最小距离的阈值。</li>
+</ul>
+<p>如果 <code>split</code> 是 <code>False</code>，函数返回分割线的高程列表；如果 <code>split</code> 是 <code>True</code>，则返回分割图像的路径。</p>
+<h4 id="示例用法"><a href="#示例用法" class="headerlink" title="示例用法"></a>示例用法</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python">import Web_page_Screenshot_Segmentation
+from Web_page_Screenshot_Segmentation.master import split_heights
+
+# 在 &#39;path&#x2F;to&#x2F;image.jpg&#39; 分割图像为几个部分
+split_image_path &#x3D; split_heights(
+    file_path&#x3D;&#39;path&#x2F;to&#x2F;image.jpg&#39;,
+    split&#x3D;True,
+    height_threshold&#x3D;102,
+    variation_threshold&#x3D;0.5,
+    color_threshold&#x3D;100,
+    color_variation_threshold&#x3D;15,
+    merge_threshold&#x3D;350
+)
+
+print(f&quot;分割后的图像保存在 &#123;split_image_path&#125;&quot;)</code></pre>
+
+<p>在这个例子中，根据提供的阈值，’path&#x2F;to&#x2F;image.jpg’ 的图像被分割成几个部分。分割后的图像保存在函数返回的路径。</p>
+<h3 id="draw-line-from-file-函数"><a href="#draw-line-from-file-函数" class="headerlink" title="draw_line_from_file 函数"></a>draw_line_from_file 函数</h3><p><code>draw_line_from_file</code> 函数用于在指定高度的图像上绘制线条。它接受以下参数：</p>
+<ul>
+<li><code>image_file</code>: 图像文件的路径。</li>
+<li><code>heights</code>: 在指定高度绘制线条的高程列表。</li>
+<li><code>color</code>: 线条的颜色。默认颜色为红色 <code>(0, 0, 255)</code>。</li>
+</ul>
+<p>该函数从提供的文件路径读取图像，在指定的高度绘制线条，然后将修改后的图像保存到新文件中。新文件保存在 <code>result</code> 目录下，与原始文件同名，但在文件扩展名前添加了 ‘result’。</p>
+<p>如果函数在读取图像文件时遇到错误（例如，如果文件路径包含 ‘.’ 或中文字符），则会抛出异常。</p>
+<h4 id="示例用法-1"><a href="#示例用法-1" class="headerlink" title="示例用法"></a>示例用法</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python">import Web_page_Screenshot_Segmentation
+from Web_page_Screenshot_Segmentation.spliter import draw_line_from_file
+
+# 在 &#39;path&#x2F;to&#x2F;image.jpg&#39; 的图像上，在高度 100 和 200 处绘制线条
+result_image_path &#x3D; draw_line_from_file(
+    image_file&#x3D;&#39;path&#x2F;to&#x2F;image.jpg&#39;,
+    heights&#x3D;[100, 200],
+    color&#x3D;(0, 255, 0)  # 以绿色绘制线条
+)
+
+print(f&quot;修改后的图像保存在 &#123;result_image_path&#125;&quot;)</code></pre>
+
+<p>在这个例子中，’path&#x2F;to&#x2F;image.jpg’ 的图像被修改，以在高度 100 和 200 处绘制绿色线条。修改后的图像保存在函数返回的路径。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Tim
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://s.zair.top/post/Web-page-Screenshot-Segmentation" title="网页长截图自动分割工具">https://s.zair.top/post/Web-page-Screenshot-Segmentation</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+          <a target="_blank" class="social-link" href="https://t.me/tim_run">
+            <span class="icon">
+              <i class="fab fa-telegram"></i>
+            </span>
+
+            <span class="label">Telegram</span>
+          </a>
+      </div>
+
+      <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E4%BB%A3%E7%A0%81%E5%B7%A5%E5%85%B7/" rel="tag"># 代码工具</a>
+              <a href="/tags/OpenCV/" rel="tag"># OpenCV</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/GPT%E7%BD%91%E9%A1%B5%E7%88%AC%E8%99%AB" rel="prev" title="GPT网页爬虫">
+                  <i class="fa fa-angle-left"></i> GPT网页爬虫
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/standard-output" rel="next" title="stderr和stdout：理解日志与输出">
+                  stderr和stdout：理解日志与输出 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments"><div id="twikoo-comments"></div></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Tim</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" integrity="sha256-4mJNT2bMXxcc1GCJaxBmMPdmah5ji0Ldnd79DKd1hoM=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha256-AjM0J5XIbiB590BrznLEgZGLnOQWrt62s3BEq65Q/I0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" integrity="sha256-9cmf7tcLdXpKsPi/2AWE93PbZpTp4M4tqzFk+lWomjU=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="twikoo" type="application/json">{"enable":true,"visitor":true,"envId":"https://twiko.zair.top/.netlify/functions/twikoo","el":"#twikoo-comments"}</script>
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.twikoo.el)
+    .then(() => NexT.utils.getScript(
+      CONFIG.twikoo.jsUrl || 'https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js',
+      { condition: window.twikoo }
+    ))
+    .then(() => {
+      twikoo.init(CONFIG.twikoo);
+    });
+});
+</script>
+<style>
+.post-block, .comments {
+  overflow: visible;
+}
+.tk-owo-emotion {
+  display: inline-block;
+}
+</style>
+
+</body>
+</html>

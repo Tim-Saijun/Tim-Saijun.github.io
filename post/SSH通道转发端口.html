@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/avatar.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/avatar.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/avatar.png">
+  <link rel="mask-icon" href="/img/avatar.png" color="#222">
+  <meta name="baidu-site-verification" content="codeva-ljr52U8lOC">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"s.zair.top","root":"/","images":"/images","scheme":"Pisces","darkmode":"auto","version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":true,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="背景：有一台服务器，仅能访问ssh服务端口，其余端口处于安全考虑均不可访问。如果想与服务器的其他端口通信，该怎么办？ 参考文章  利用ssh通道，即可任意通信，下面这张图很直观。 基本命令基本命令如下，利用： ssh -L 本地端口X:主机C:主机C端口Z username@hostB 利用本机与hostB的SSH隧道，通过访问本机的X端口实现对主机C Z端口的访问。本质是B访问了C，再经由通道">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSH通道转发端口">
+<meta property="og:url" content="https://s.zair.top/post/SSH%E9%80%9A%E9%81%93%E8%BD%AC%E5%8F%91%E7%AB%AF%E5%8F%A3">
+<meta property="og:site_name" content="以太工坊">
+<meta property="og:description" content="背景：有一台服务器，仅能访问ssh服务端口，其余端口处于安全考虑均不可访问。如果想与服务器的其他端口通信，该怎么办？ 参考文章  利用ssh通道，即可任意通信，下面这张图很直观。 基本命令基本命令如下，利用： ssh -L 本地端口X:主机C:主机C端口Z username@hostB 利用本机与hostB的SSH隧道，通过访问本机的X端口实现对主机C Z端口的访问。本质是B访问了C，再经由通道">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pic4.zhimg.com/80/v2-571245695702ebd39862b756da6a933f_720w.webp">
+<meta property="article:published_time" content="2023-02-27T12:45:44.000Z">
+<meta property="article:modified_time" content="2024-02-22T03:52:12.271Z">
+<meta property="article:author" content="Tim">
+<meta property="article:tag" content="技术贴士">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic4.zhimg.com/80/v2-571245695702ebd39862b756da6a933f_720w.webp">
+
+
+<link rel="canonical" href="https://s.zair.top/post/SSH%E9%80%9A%E9%81%93%E8%BD%AC%E5%8F%91%E7%AB%AF%E5%8F%A3.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://s.zair.top/post/SSH%E9%80%9A%E9%81%93%E8%BD%AC%E5%8F%91%E7%AB%AF%E5%8F%A3","path":"/post/SSH通道转发端口.html","title":"SSH通道转发端口"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SSH通道转发端口 | 以太工坊</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?5e5c8e78bcbcec96b8795ab83fc501b0"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="以太工坊" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">以太工坊</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">以太工坊</p>
+      <img class="custom-logo-image" src="/img/avatar.png" alt="以太工坊">
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-标准版"><a href="https://www.zair.top/" rel="section" target="_blank"><i class="fa fa-sitemap fa-fw"></i>标准版</a></li><li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4"><span class="nav-text">基本命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E9%80%89%E5%8F%82%E6%95%B0"><span class="nav-text">可选参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-text">应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AA%81%E7%A0%B4%E9%98%B2%E7%81%AB%E5%A2%99"><span class="nav-text">突破防火墙</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E5%88%86%E5%8C%BA"><span class="nav-text">网络分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E9%9D%9E%E5%85%AC%E7%BD%91%E7%AB%AF%E5%8F%A3"><span class="nav-text">访问非公网端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91"><span class="nav-text">动态端口转发</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tim</p>
+  <div class="site-description" itemprop="description">分享我的学习笔记、经验与有趣的小玩意.<br></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tim-Saijun" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tim-Saijun" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yangzair@outlook.com" title="E-Mail → mailto:yangzair@outlook.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/tim_run" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;tim_run" rel="noopener me" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zair.top/" title="标准版 → https:&#x2F;&#x2F;www.zair.top" rel="noopener me" target="_blank"><i class="fa fa-globe fa-fw"></i>标准版</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://s.zair.top/post/SSH%E9%80%9A%E9%81%93%E8%BD%AC%E5%8F%91%E7%AB%AF%E5%8F%A3">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tim">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="以太工坊">
+      <meta itemprop="description" content="分享我的学习笔记、经验与有趣的小玩意.<br>">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SSH通道转发端口 | 以太工坊">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSH通道转发端口
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-02-27 20:45:44" itemprop="dateCreated datePublished" datetime="2023-02-27T20:45:44+08:00">2023-02-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-22 11:52:12" itemprop="dateModified" datetime="2024-02-22T11:52:12+08:00">2024-02-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B8%96%E5%AD%90/" itemprop="url" rel="index"><span itemprop="name">技术帖子</span></a>
+        </span>
+    </span>
+
+  
+    <span id="/post/SSH%E9%80%9A%E9%81%93%E8%BD%AC%E5%8F%91%E7%AB%AF%E5%8F%A3" class="post-meta-item twikoo_visitors" data-flag-title="SSH通道转发端口" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="twikoo_visitors"></span>
+    </span>
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>背景：有一台服务器，仅能访问ssh服务端口，其余端口处于安全考虑均不可访问。如果想与服务器的其他端口通信，该怎么办？ <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/148825449">参考文章</a></p>
+</blockquote>
+<p>利用ssh通道，即可任意通信，下面这张图很直观。<br><img src="https://pic4.zhimg.com/80/v2-571245695702ebd39862b756da6a933f_720w.webp" alt="SSH tunel"></p>
+<h2 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h2><p>基本命令如下，利用：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">ssh -L 本地端口X:主机C:主机C端口Z username@hostB</code></pre>
+<p>利用本机与hostB的SSH隧道，通过访问本机的X端口实现对主机C Z端口的访问。本质是B访问了C，再经由通道与本机连接。</p>
+<h2 id="可选参数"><a href="#可选参数" class="headerlink" title="可选参数"></a>可选参数</h2><ul>
+<li><code>-N</code> 表示不登录ssh，只进行端口转发。</li>
+<li><code>-f</code> 表示将 SSH 进程放到后台运行。</li>
+<li><code>-L</code> 表示进行本地端口转发，格式为：<code>本地端口:目标主机:目标端口</code>。一条命令可以有多个-L参数代表多条规则。</li>
+<li><code>-R</code> 反向转发，但本地主机与C的位置要调换。如<code>ssh -R 8000:localhost:8080 user@ssh_server</code> 是将服务器的8000转发到本地的8080端口。</li>
+<li><code>-D</code> 流量SOCKS5代理。</li>
+</ul>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><h3 id="突破防火墙"><a href="#突破防火墙" class="headerlink" title="突破防火墙"></a>突破防火墙</h3><blockquote>
+<p>即背景介绍。防火墙阻止了主机A对主机B一些端口的连接，但主机B仍有部分端口是对主机A开放的。这时主机A如果需要访问主机B上被防火墙阻挡的端口，就可以通过SSH连接主机B＋端口转发来进行。需注意，这时所谓的主机C就是主机B。</p>
+</blockquote>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">ssh -L 5000:localhost:5000 root@MLB -p 4701 -N</code></pre>
+<p>这样访问本机的5000端口，就可以访问到服务器的5000端口，而实际上5000端口被防火墙阻止了。</p>
+<h3 id="网络分区"><a href="#网络分区" class="headerlink" title="网络分区"></a>网络分区</h3><blockquote>
+<p>主机B与主机C处于同一内网中，主机B能够与外界联系而主机C不能。这时不处于内网中的主机A如果想要访问主机C，就可以通过SSH连接主机B＋端口转发来进行。</p>
+</blockquote>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">ssh -L 22022:10.0.2.15:22 desktop_user@192.168.1.11</code></pre>
+<p>主机B的ip为192.168.1.11，10.0.2.15是B中的一个虚拟机C,主机B执行这条命令即可经本地22022端口访问到虚拟机的22端口。</p>
+<h3 id="访问非公网端口"><a href="#访问非公网端口" class="headerlink" title="访问非公网端口"></a>访问非公网端口</h3><blockquote>
+<p>处于内网之中的主机A可以访问公网，但不具有公网IP；公网中的主机B无法找到A，但为A开放各个端口的访问（A可以直接连接B，反之则不行）。这时A想要让B访问自己，就可以通过SSH连接主机B＋端口转发来进行。需注意，这时所谓的主机C就是主机A。</p>
+</blockquote>
+<p>见<code>-R</code> 的参数说明。</p>
+<h3 id="动态端口转发"><a href="#动态端口转发" class="headerlink" title="动态端口转发"></a>动态端口转发</h3><p>一般可用作代理，用于在本地计算机上创建一个 SOCKS 代理服务器。通过 <code>-D</code> 参数创建的 SOCKS 代理服务器可以将本地计算机上的网络流量通过 SSH 隧道转发到远程服务器，从而实现本地计算机上的应用程序通过远程服务器访问互联网的功能。<code>-D</code> 参数的语法如下：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">ssh -D [bind_address:]port user@ssh_server</code></pre>
+<p>其中，<code>bind_address</code> 表示绑定的 IP 地址，可以省略；<code>port</code> 表示要创建的 SOCKS 代理服务器监听的端口号。该命令将在本地计算机上启动一个 SOCKS 代理服务器，并将该服务器绑定到指定的端口上。<br>例如，如果想要在本地计算机上创建一个 SOCKS 代理服务器，将所有网络流量通过远程服务器转发到互联网上，可以使用以下命令：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">ssh -D 1080 user@ssh_server</code></pre>
+<p>在执行该命令后，可以将本地计算机上的应用程序（如浏览器）的代理设置为 <code>127.0.0.1:1080</code>，从而将所有网络流量通过 SSH 隧道转发到远程服务器上，并从远程服务器访问互联网。请注意，为了保护数据的安全性，建议使用加密的 SSH 连接进行 SOCKS 代理。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Tim
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://s.zair.top/post/SSH%E9%80%9A%E9%81%93%E8%BD%AC%E5%8F%91%E7%AB%AF%E5%8F%A3" title="SSH通道转发端口">https://s.zair.top/post/SSH通道转发端口</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+          <a target="_blank" class="social-link" href="https://t.me/tim_run">
+            <span class="icon">
+              <i class="fab fa-telegram"></i>
+            </span>
+
+            <span class="label">Telegram</span>
+          </a>
+      </div>
+
+      <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%8A%80%E6%9C%AF%E8%B4%B4%E5%A3%AB/" rel="tag"># 技术贴士</a>
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/CVP_demo" rel="prev" title="医学超声质控系统简介">
+                  <i class="fa fa-angle-left"></i> 医学超声质控系统简介
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80%E6%A8%A1%E6%9D%BF" rel="next" title="算法基础模板">
+                  算法基础模板 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments"><div id="twikoo-comments"></div></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Tim</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" integrity="sha256-4mJNT2bMXxcc1GCJaxBmMPdmah5ji0Ldnd79DKd1hoM=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha256-AjM0J5XIbiB590BrznLEgZGLnOQWrt62s3BEq65Q/I0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" integrity="sha256-9cmf7tcLdXpKsPi/2AWE93PbZpTp4M4tqzFk+lWomjU=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="twikoo" type="application/json">{"enable":true,"visitor":true,"envId":"https://twiko.zair.top/.netlify/functions/twikoo","el":"#twikoo-comments"}</script>
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.twikoo.el)
+    .then(() => NexT.utils.getScript(
+      CONFIG.twikoo.jsUrl || 'https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js',
+      { condition: window.twikoo }
+    ))
+    .then(() => {
+      twikoo.init(CONFIG.twikoo);
+    });
+});
+</script>
+<style>
+.post-block, .comments {
+  overflow: visible;
+}
+.tk-owo-emotion {
+  display: inline-block;
+}
+</style>
+
+</body>
+</html>

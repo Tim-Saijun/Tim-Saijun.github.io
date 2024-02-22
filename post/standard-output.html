@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/avatar.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/avatar.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/avatar.png">
+  <link rel="mask-icon" href="/img/avatar.png" color="#222">
+  <meta name="baidu-site-verification" content="codeva-ljr52U8lOC">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"s.zair.top","root":"/","images":"/images","scheme":"Pisces","darkmode":"auto","version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":true,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="以Python为例探讨stdout和stderr的区别和应用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="stderr和stdout：理解日志与输出">
+<meta property="og:url" content="https://s.zair.top/post/standard-output">
+<meta property="og:site_name" content="以太工坊">
+<meta property="og:description" content="以Python为例探讨stdout和stderr的区别和应用">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-02-17T12:42:32.000Z">
+<meta property="article:modified_time" content="2024-02-22T03:52:12.275Z">
+<meta property="article:author" content="Tim">
+<meta property="article:tag" content="标准输出">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://s.zair.top/post/standard-output.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://s.zair.top/post/standard-output","path":"/post/standard-output.html","title":"stderr和stdout：理解日志与输出"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>stderr和stdout：理解日志与输出 | 以太工坊</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?5e5c8e78bcbcec96b8795ab83fc501b0"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="以太工坊" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">以太工坊</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">以太工坊</p>
+      <img class="custom-logo-image" src="/img/avatar.png" alt="以太工坊">
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-标准版"><a href="https://www.zair.top/" rel="section" target="_blank"><i class="fa fa-sitemap fa-fw"></i>标准版</a></li><li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E8%BE%93%E5%87%BA%EF%BC%88stdout%EF%BC%89%E4%B8%8E%E6%A0%87%E5%87%86%E9%94%99%E8%AF%AF%EF%BC%88stderr%EF%BC%89"><span class="nav-text">标准输出（stdout）与标准错误（stderr）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python%E4%B8%AD%E7%9A%84print%E5%92%8Clogging"><span class="nav-text">Python中的print和logging</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8print"><span class="nav-text">使用print</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8logging"><span class="nav-text">使用logging</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tqdm%E4%B8%8Estderr"><span class="nav-text">tqdm与stderr</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%B5%81stdout%E5%92%8Cstderr"><span class="nav-text">分流stdout和stderr</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8nohup%E7%AE%A1%E7%90%86stdout%E5%92%8Cstderr"><span class="nav-text">使用nohup管理stdout和stderr</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%BC%80stdout%E5%92%8Cstderr%E7%9A%84nohup%E4%BD%BF%E7%94%A8"><span class="nav-text">分开stdout和stderr的nohup使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8Python%E4%B8%AD%E7%9A%84%E7%BC%93%E5%86%B2%E8%A1%8C%E4%B8%BA"><span class="nav-text">在Python中的缓冲行为</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8Python%E5%B9%B6%E5%8F%91%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E8%A1%A8%E7%8E%B0"><span class="nav-text">在Python并发环境中的表现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python%E6%8E%A7%E5%88%B6stdout%E5%92%8Cstderr"><span class="nav-text">Python控制stdout和stderr</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-text">建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8C-%E4%B8%AD%E7%9A%84%E7%BC%93%E5%86%B2%E8%A1%8C%E4%B8%BA"><span class="nav-text">在C++中的缓冲行为</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%AE%9A%E5%90%91stdout%E5%92%8Cstderr"><span class="nav-text">重定向stdout和stderr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-text">C++多线程环境中的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%8E%A7%E5%88%B6%E8%BE%93%E5%87%BA"><span class="nav-text">C++控制输出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE-1"><span class="nav-text">建议</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tim</p>
+  <div class="site-description" itemprop="description">分享我的学习笔记、经验与有趣的小玩意.<br></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tim-Saijun" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tim-Saijun" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yangzair@outlook.com" title="E-Mail → mailto:yangzair@outlook.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/tim_run" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;tim_run" rel="noopener me" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zair.top/" title="标准版 → https:&#x2F;&#x2F;www.zair.top" rel="noopener me" target="_blank"><i class="fa fa-globe fa-fw"></i>标准版</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://s.zair.top/post/standard-output">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tim">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="以太工坊">
+      <meta itemprop="description" content="分享我的学习笔记、经验与有趣的小玩意.<br>">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="stderr和stdout：理解日志与输出 | 以太工坊">
+      <meta itemprop="description" content="以Python为例探讨stdout和stderr的区别和应用">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          stderr和stdout：理解日志与输出
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-17 20:42:32" itemprop="dateCreated datePublished" datetime="2024-02-17T20:42:32+08:00">2024-02-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-22 11:52:12" itemprop="dateModified" datetime="2024-02-22T11:52:12+08:00">2024-02-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%AE%97%E6%B3%95%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">算法编程</span></a>
+        </span>
+    </span>
+
+  
+    <span id="/post/standard-output" class="post-meta-item twikoo_visitors" data-flag-title="stderr和stdout：理解日志与输出" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="twikoo_visitors"></span>
+    </span>
+  
+</div>
+
+            <div class="post-description">以Python为例探讨stdout和stderr的区别和应用</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>标准输出（<code>stdout</code>）与标准错误（<code>stderr</code>）这两个概念虽然简单，但在日志记录、错误处理和数据流管理中扮演着核心角色。本文将探讨<code>stdout</code>和<code>stderr</code>的区别和应用，尤其是在Python环境中如何有效地使用它们。</p>
+<h2 id="标准输出（stdout）与标准错误（stderr）"><a href="#标准输出（stdout）与标准错误（stderr）" class="headerlink" title="标准输出（stdout）与标准错误（stderr）"></a>标准输出（<code>stdout</code>）与标准错误（<code>stderr</code>）</h2><p>在大多数操作系统中，标准输出和标准错误是进程的两个主要输出流。它们提供了一种机制，使得进程可以将信息和错误消息发送到终端或文件。虽然这两个流在物理上可能相同（例如，都显示在同一终端界面上），但它们在逻辑上用于不同的目的：</p>
+<ul>
+<li><strong>标准输出（<code>stdout</code>）</strong>：通常用于输出程序的执行结果或正常的运行信息。</li>
+<li><strong>标准错误（<code>stderr</code>）</strong>：专门用于输出错误消息或警告，即使在标准输出被重定向时，这些信息通常也需要被看到或记录。</li>
+</ul>
+<h2 id="Python中的print和logging"><a href="#Python中的print和logging" class="headerlink" title="Python中的print和logging"></a>Python中的<code>print</code>和<code>logging</code></h2><p>在Python中，<code>print</code>函数默认将信息发送到<code>stdout</code>，而<code>logging</code>模块则默认将日志消息发送到<code>stderr</code>。这样做的目的是区分正常的程序输出和日志（包括错误和调试信息）输出，使得开发者可以更容易地管理和过滤输出信息。</p>
+<h3 id="使用print"><a href="#使用print" class="headerlink" title="使用print"></a>使用<code>print</code></h3><p><code>print</code>是Python中最基本的输出函数，用于将信息输出到标准输出流。它简单易用，适合于快速的调试或向用户显示信息。例如：</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">print(&quot;Hello, world!&quot;)</code></pre>
+
+<h3 id="使用logging"><a href="#使用logging" class="headerlink" title="使用logging"></a>使用<code>logging</code></h3><p><code>logging</code>模块提供了一个灵活的框架，用于在应用程序中添加日志消息。与<code>print</code>不同，<code>logging</code>支持不同的日志级别（DEBUG, INFO, WARNING, ERROR, CRITICAL），允许开发者根据需要调整日志的详细程度和输出位置。例如：</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">import logging
+
+logging.error(&#39;This is an error message&#39;)
+</code></pre>
+
+<h2 id="tqdm与stderr"><a href="#tqdm与stderr" class="headerlink" title="tqdm与stderr"></a>tqdm与<code>stderr</code></h2><p>在复杂的或长时间运行的程序中，使用进度条是向用户展示进程进度的一种有效方式。Python的<code>tqdm</code>库是一个广泛使用的工具，用于在命令行中添加进度条。<code>tqdm</code>默认将进度信息输出到<code>stderr</code>，以免干扰到正常的程序输出（<code>stdout</code>）。</p>
+<h3 id="分流stdout和stderr"><a href="#分流stdout和stderr" class="headerlink" title="分流stdout和stderr"></a>分流<code>stdout</code>和<code>stderr</code></h3><p>在某些情况下，将正常输出和错误或日志消息分开，例如，将它们重定向到不同的文件或终端。在命令行中，可以使用重定向操作符<code>&gt;</code>和<code>2&gt;</code>来实现。在Python代码中，可以通过配置<code>logging</code>模块或使用特定的文件对象来实现更细粒度的控制。</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">python script.py &gt; output.log 2&gt; error.log
+</code></pre>
+
+<p>通过命令行重定向、Python的<code>print</code>函数甚至<code>logging</code>模块，都可以灵活地控制和分流这两种类型的输出，使得错误处理、日志记录和用户交互更加清晰和有序。</p>
+<h2 id="使用nohup管理stdout和stderr"><a href="#使用nohup管理stdout和stderr" class="headerlink" title="使用nohup管理stdout和stderr"></a>使用<code>nohup</code>管理<code>stdout</code>和<code>stderr</code></h2><p>在部署长时间运行的后台进程时，<code>nohup</code>命令成为了一个重要的工具。<code>nohup</code>，或“no hang up”，允许命令在用户注销后继续运行，这对于远程启动任务尤其有用。<code>nohup</code>的一个关键特性是它的能力来管理<code>stdout</code>和<code>stderr</code>。</p>
+<p>默认情况下，使用<code>nohup</code>运行命令会将<code>stdout</code>和<code>stderr</code>合并重定向到<code>nohup.out</code>文件，除非另外指定。这意味着无论是正常的输出还是错误消息，都会被捕获到同一个文件中，方便日后审查。但在某些情况下，将这两种输出分开可能更有用。</p>
+<h3 id="分开stdout和stderr的nohup使用"><a href="#分开stdout和stderr的nohup使用" class="headerlink" title="分开stdout和stderr的nohup使用"></a>分开<code>stdout</code>和<code>stderr</code>的<code>nohup</code>使用</h3><p>要在使用<code>nohup</code>时将<code>stdout</code>和<code>stderr</code>输出到不同的文件，可以结合使用重定向操作符。例如：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">nohup python script.py &gt; output.log 2&gt; error.log &amp;</code></pre>
+
+<p>这条命令将<code>stdout</code>重定向到<code>output.log</code>，<code>stderr</code>重定向到<code>error.log</code>，并通过<code>&amp;</code>在后台运行。这样，即使关闭了终端或者SSH会话，程序也会继续运行，并且其输出会被妥善记录。</p>
+<h2 id="在Python中的缓冲行为"><a href="#在Python中的缓冲行为" class="headerlink" title="在Python中的缓冲行为"></a>在Python中的缓冲行为</h2><p><code>stdout</code>和<code>stderr</code>在缓冲数据时表现不同。默认情况下，<code>stdout</code>是行缓冲的，当连接到终端时，它会缓存数据直到收到换行符或缓冲区满；在非交互模式下，<code>stdout</code> 是块缓冲的（像文件一样）。 而<code>stderr</code>总是行缓冲的（python 3.9版本之前，非交互模式下是块缓冲）。以下内容来自官方文档<a target="_blank" rel="noopener" href="https://docs.python.org/3.12/library/sys.html#sys.stdout">sys — 系统相关的形参和函数 — Python 3.12.2 文档</a></p>
+<blockquote>
+<p>When interactive, the <code>stdout</code> stream is line-buffered. Otherwise, it is block-buffered like regular text files. The <code>stderr</code> stream is line-buffered in both cases. You can make both streams unbuffered by passing the <code>[u](&lt;https://docs.python.org/3.12/using/cmdline.html#cmdoption-u&gt;)</code> command-line option or setting the <code>[PYTHONUNBUFFERED](&lt;https://docs.python.org/3.12/using/cmdline.html#envvar-PYTHONUNBUFFERED&gt;)</code> environment variable.</p>
+<p><em>Changed in version 3.9:</em> Non-interactive <code>stderr</code> is now line-buffered instead of fully buffered.</p>
+</blockquote>
+<p>缓冲粒度越小，输出就越及时，但相应的IO代价就更大。Python 3.8及之前，将<code>stdout</code> 和<code>stderr</code> 做了相同粒度的缓冲，实在是不太合理；在3.9版本后，<code>stderr</code> 有了更小的缓冲粒度，意味着每个写入操作的输出会比<code>stdout</code> 更及时。这种差异使得<code>stderr</code>适合于错误和日志信息，确保即使在程序崩溃或异常退出时，这些信息也能比标准输出有更高的优先级。</p>
+<p>在C++中，标准错误是无缓冲的（见后文），更为激进，但我个人认为这种会更合理一些。</p>
+<p>但好在，Python中可以通过<code>python -u</code>或设置环境变量<code>PYTHONUNBUFFERED</code>来禁用这种缓冲行为，或是直接操作<code>sys.stdout.flush()</code>来控制输出时机。</p>
+<h2 id="在Python并发环境中的表现"><a href="#在Python并发环境中的表现" class="headerlink" title="在Python并发环境中的表现"></a>在Python并发环境中的表现</h2><p>在多线程或多进程环境中使用<code>stdout</code>和<code>stderr</code>时，输出可能会交错或混乱，因为来自不同线程或进程的输出可能会在写入终端或文件时相互干扰。解决这一问题的一种方法是为每个线程或进程创建独立的输出文件，或使用线程锁（thread locks）或进程同步机制（如<code>multiprocessing.Lock</code>）来同步对<code>stdout</code>或<code>stderr</code>的访问。</p>
+<h2 id="Python控制stdout和stderr"><a href="#Python控制stdout和stderr" class="headerlink" title="Python控制stdout和stderr"></a>Python控制<code>stdout</code>和<code>stderr</code></h2><p>在复杂的应用中，你可能需要更灵活地控制输出流的目的地。Python提供了多种方式来实现这一点：</p>
+<ul>
+<li>**重定向<code>stdout</code>和<code>stderr</code>**：可以通过改变<code>sys.stdout</code>和<code>sys.stderr</code>的值来重定向Python程序的标准输出和错误输出。这对于捕获和分析输出，或将输出重定向到图形界面等非标准输出设备特别有用。</li>
+<li><strong>使用<code>subprocess</code>模块</strong>：当运行外部命令或脚本时，<code>subprocess</code>模块允许你控制命令的<code>stdout</code>和<code>stderr</code>流，包括将它们重定向到Python程序内部的变量，或将它们分开或合并。</li>
+<li><strong>日志模块的高级应用</strong>：Python的<code>logging</code>模块支持将日志输出到多个目的地，包括文件、标准输出、网络等。通过配置不同的日志处理器（handlers），你可以实现复杂的日志管理方案，如基于日志级别或消息内容将日志分流到不同的输出中。</li>
+</ul>
+<h3 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h3><ul>
+<li><strong>谨慎管理输出</strong>：在设计软件时，明确区分用于用户交互的输出（<code>stdout</code>）和用于错误报告或日志记录的输出（<code>stderr</code>）。这有助于提高程序的可用性和维护性。</li>
+<li><strong>优化性能</strong>：考虑输出操作的性能影响，特别是在高频率日志或数据输出的场景下。合理使用缓冲和批量处理可以减少对性能的影响。</li>
+<li><strong>安全性考虑</strong>：在输出敏感信息前进行适当的过滤和脱敏，避免通过日志泄露敏感数据。</li>
+</ul>
+<p>通过深入理解和灵活应用<code>stdout</code>和<code>stderr</code>，可以构建出更健壮、更易于管理的Python应用程序，有效地处理日志和输出，提升用户体验和应用稳定性。</p>
+<h2 id="在C-中的缓冲行为"><a href="#在C-中的缓冲行为" class="headerlink" title="在C++中的缓冲行为"></a>在C++中的缓冲行为</h2><p>在C++中，<code>stdout</code>（通常对应于<code>std::cout</code>）和<code>stderr</code>（对应于<code>std::cerr</code>）有不同的缓冲策略：</p>
+<ul>
+<li><strong><code>std::cout</code></strong> 默认是行缓冲的，这意味着当它连接到一个终端时，输出会在每次换行时刷新，或者缓冲区满时刷新。</li>
+<li><strong><code>std::cerr</code></strong> 默认是无缓冲的，因此每次写入<code>std::cerr</code>的数据都会立即输出，这对于报告错误信息非常有用，因为它减少了程序崩溃导致错误信息未被输出的风险。</li>
+</ul>
+<h2 id="重定向stdout和stderr"><a href="#重定向stdout和stderr" class="headerlink" title="重定向stdout和stderr"></a>重定向<code>stdout</code>和<code>stderr</code></h2><p>在C++程序中，可以通过多种方式重定向<code>stdout</code>和<code>stderr</code>。一种常见的方法是使用<code>freopen</code>函数在程序运行时重定向标准输出或错误输出到文件：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">freopen(&quot;output.txt&quot;, &quot;w&quot;, stdout);
+freopen(&quot;error.log&quot;, &quot;w&quot;, stderr);</code></pre>
+
+<p>这种方法可以用于将输出重定向到文件，方便日后分析和调试。</p>
+<h2 id="C-多线程环境中的使用"><a href="#C-多线程环境中的使用" class="headerlink" title="C++多线程环境中的使用"></a>C++多线程环境中的使用</h2><p>在多线程的C++程序中使用<code>std::cout</code>和<code>std::cerr</code>时，可能会遇到竞争条件，导致输出混乱。为了避免这种情况，推荐使用互斥锁（如<code>std::mutex</code>）来同步对这些流的访问：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;mutex&gt;
+#include &lt;thread&gt;
+
+std::mutex cout_mutex;
+
+void thread_function(int id) &#123;
+    std::lock_guard&lt;std::mutex&gt; lock(cout_mutex);
+    std::cout &lt;&lt; &quot;Thread &quot; &lt;&lt; id &lt;&lt; &quot; is running\\\\n&quot;;
+&#125;
+
+int main() &#123;
+    std::thread t1(thread_function, 1);
+    std::thread t2(thread_function, 2);
+
+    t1.join();
+    t2.join();
+
+    return 0;
+&#125;</code></pre>
+
+<h2 id="C-控制输出"><a href="#C-控制输出" class="headerlink" title="C++控制输出"></a>C++控制输出</h2><p>C++标准库提供了<code>std::streambuf</code>，可以用来实现对<code>std::cout</code>和<code>std::cerr</code>更细粒度的控制，包括重定向和自定义缓冲行为。通过继承<code>std::streambuf</code>并重写相应的成员函数，你可以创建自定义的缓冲策略，或将输出重定向到GUI组件、网络连接等。</p>
+<h3 id="建议-1"><a href="#建议-1" class="headerlink" title="建议"></a>建议</h3><ul>
+<li><strong>合理使用缓冲</strong>：根据应用场景选择合适的缓冲策略。对于需要立即反馈的错误信息，使用<code>std::cerr</code>或手动刷新<code>std::cout</code>。</li>
+<li><strong>避免在多线程中直接使用标准输出</strong>：使用互斥锁或其他同步机制来保证输出的一致性和顺序。</li>
+<li>**使用重定向和自定义<code>streambuf</code>**：为了更灵活地处理输出，考虑使用重定向或自定义<code>streambuf</code>来实现特殊的输出需求，如日志记录、网络传输等。</li>
+</ul>
+<p>通过掌握这些进阶技术，可以在保证C++程序健壮性和灵活性的同时，有效地管理和控制程序的输出。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Tim
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://s.zair.top/post/standard-output" title="stderr和stdout：理解日志与输出">https://s.zair.top/post/standard-output</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+          <a target="_blank" class="social-link" href="https://t.me/tim_run">
+            <span class="icon">
+              <i class="fab fa-telegram"></i>
+            </span>
+
+            <span class="label">Telegram</span>
+          </a>
+      </div>
+
+      <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%A0%87%E5%87%86%E8%BE%93%E5%87%BA/" rel="tag"># 标准输出</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/Web-page-Screenshot-Segmentation" rel="prev" title="网页长截图自动分割工具">
+                  <i class="fa fa-angle-left"></i> 网页长截图自动分割工具
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments"><div id="twikoo-comments"></div></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Tim</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" integrity="sha256-4mJNT2bMXxcc1GCJaxBmMPdmah5ji0Ldnd79DKd1hoM=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha256-AjM0J5XIbiB590BrznLEgZGLnOQWrt62s3BEq65Q/I0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" integrity="sha256-9cmf7tcLdXpKsPi/2AWE93PbZpTp4M4tqzFk+lWomjU=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="twikoo" type="application/json">{"enable":true,"visitor":true,"envId":"https://twiko.zair.top/.netlify/functions/twikoo","el":"#twikoo-comments"}</script>
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.twikoo.el)
+    .then(() => NexT.utils.getScript(
+      CONFIG.twikoo.jsUrl || 'https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js',
+      { condition: window.twikoo }
+    ))
+    .then(() => {
+      twikoo.init(CONFIG.twikoo);
+    });
+});
+</script>
+<style>
+.post-block, .comments {
+  overflow: visible;
+}
+.tk-owo-emotion {
+  display: inline-block;
+}
+</style>
+
+</body>
+</html>

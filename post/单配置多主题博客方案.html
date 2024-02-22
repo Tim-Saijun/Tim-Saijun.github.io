@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/avatar.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/avatar.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/avatar.png">
+  <link rel="mask-icon" href="/img/avatar.png" color="#222">
+  <meta name="baidu-site-verification" content="codeva-ljr52U8lOC">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"s.zair.top","root":"/","images":"/images","scheme":"Pisces","darkmode":"auto","version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":true,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="介绍单份文件部署多主题博客">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单配置多主题博客方案">
+<meta property="og:url" content="https://s.zair.top/post/%E5%8D%95%E9%85%8D%E7%BD%AE%E5%A4%9A%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2%E6%96%B9%E6%A1%88">
+<meta property="og:site_name" content="以太工坊">
+<meta property="og:description" content="介绍单份文件部署多主题博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.saijun.eu.org/pic/2023/09/0b7fb307bea391b2e17d21a94314544b.png">
+<meta property="og:image" content="https://cdn.saijun.eu.org/pic/2023/09/42e78625e505e51a195089a0752bd993.png">
+<meta property="article:published_time" content="2023-09-09T08:52:47.000Z">
+<meta property="article:modified_time" content="2024-02-22T03:52:12.275Z">
+<meta property="article:author" content="Tim">
+<meta property="article:tag" content="Vercel">
+<meta property="article:tag" content="Netlify">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.saijun.eu.org/pic/2023/09/0b7fb307bea391b2e17d21a94314544b.png">
+
+
+<link rel="canonical" href="https://s.zair.top/post/%E5%8D%95%E9%85%8D%E7%BD%AE%E5%A4%9A%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2%E6%96%B9%E6%A1%88.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://s.zair.top/post/%E5%8D%95%E9%85%8D%E7%BD%AE%E5%A4%9A%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2%E6%96%B9%E6%A1%88","path":"/post/单配置多主题博客方案.html","title":"单配置多主题博客方案"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>单配置多主题博客方案 | 以太工坊</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?5e5c8e78bcbcec96b8795ab83fc501b0"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="以太工坊" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">以太工坊</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">以太工坊</p>
+      <img class="custom-logo-image" src="/img/avatar.png" alt="以太工坊">
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-标准版"><a href="https://www.zair.top/" rel="section" target="_blank"><i class="fa fa-sitemap fa-fw"></i>标准版</a></li><li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B5%B7%E5%9B%A0"><span class="nav-text">起因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-text">配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E9%97%AE%E9%A2%98"><span class="nav-text">路由问题</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tim</p>
+  <div class="site-description" itemprop="description">分享我的学习笔记、经验与有趣的小玩意.<br></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tim-Saijun" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tim-Saijun" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yangzair@outlook.com" title="E-Mail → mailto:yangzair@outlook.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/tim_run" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;tim_run" rel="noopener me" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zair.top/" title="标准版 → https:&#x2F;&#x2F;www.zair.top" rel="noopener me" target="_blank"><i class="fa fa-globe fa-fw"></i>标准版</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://s.zair.top/post/%E5%8D%95%E9%85%8D%E7%BD%AE%E5%A4%9A%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2%E6%96%B9%E6%A1%88">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tim">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="以太工坊">
+      <meta itemprop="description" content="分享我的学习笔记、经验与有趣的小玩意.<br>">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="单配置多主题博客方案 | 以太工坊">
+      <meta itemprop="description" content="介绍单份文件部署多主题博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          单配置多主题博客方案
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-09 16:52:47" itemprop="dateCreated datePublished" datetime="2023-09-09T16:52:47+08:00">2023-09-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-22 11:52:12" itemprop="dateModified" datetime="2024-02-22T11:52:12+08:00">2024-02-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B8%96%E5%AD%90/" itemprop="url" rel="index"><span itemprop="name">技术帖子</span></a>
+        </span>
+    </span>
+
+  
+    <span id="/post/%E5%8D%95%E9%85%8D%E7%BD%AE%E5%A4%9A%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2%E6%96%B9%E6%A1%88" class="post-meta-item twikoo_visitors" data-flag-title="单配置多主题博客方案" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="twikoo_visitors"></span>
+    </span>
+  
+</div>
+
+            <div class="post-description">介绍单份文件部署多主题博客</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><blockquote>
+<p>很少有主题能兼顾实用与美观，比如极光主题虽然炫酷好看，但是单页展示的内容过少，不能专注于内容；<del>就是想折腾</del></p>
+</blockquote>
+<p>因而产生了如下需求：</p>
+<ul>
+<li>一份配置文件生成多种主题的博客，同时存在</li>
+<li>站点间路由一致，方便随时切换<br>由于现在的博客全站是基于Git管理的，虽然可以使用不同的分支管理不同的主题，但这么做在每次更新文章的时候非常不方便，所以这种方案不采用。</li>
+</ul>
+<span id="more"></span>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>由于<code>hexo generate</code>可以指定配置文件，这就为本方案提供了可能。<br>本次使用的是Hexo Next 8 和 Aurora 两套主题，配置文件在根目录的组织形式如下：</p>
+<pre class="line-numbers language-none"><code class="language-none">-&#x2F;
+--_config.yml  为Aurora准备的全局配置
+--_configsimple.yml  为Next准备的全局配置
+--_config.aurora.yml  Aurora主题配置
+--_config.next.yml  Next主题配置</code></pre>
+<p>对于一般的主题，使用<code>hexo generate --config x.yml</code>也就没什么问题了，但是Aurora主题需要的插件<code>hexo-plugin-aurora</code>直接是对hexo命令生效的，也就是Aurora主题与其它主题互斥，有它在的情况下，就别想用别的主题，难道就没办法了吗？<br>由于不了解npm，我想到的笨办法是直接把<code>hexo-plugin-aurora</code>卸了，在构建需要时再装回来，这样就能保持<code>package.json</code>是干净的。<br>捋一下，现在为了两套主题，我们要做的：</p>
+<ul>
+<li>维护好各自独有的依赖</li>
+<li>使用自定义的生成命令</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>主题</th>
+<th>安装阶段</th>
+<th>生成阶段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Aurora</td>
+<td><code>npm install hexo-plugin-aurora</code></td>
+<td><code>hexo generate --config _config.yml </code></td>
+</tr>
+<tr>
+<td>Next 8</td>
+<td>无额外依赖</td>
+<td><code>hexo generate --config _configsimple.yml</code></td>
+</tr>
+</tbody></table>
+<h1 id="路由问题"><a href="#路由问题" class="headerlink" title="路由问题"></a>路由问题</h1><p>统一多个站点的路由，比如我现在在<a target="_blank" rel="noopener" href="http://www.zair.top/post/a">www.zair.top/post/a</a> 页面里面，想要切换到另一个主题，只需要把www替换成s即可，即s.zair.top&#x2F;post&#x2F;a ，从而实现快速切换主题。</p>
+<p>这里的问题主要在地址的.html后缀上，一般来说，确保多个主题的全局配置文件中的以下字段统一即可：</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"># permalink: :year&#x2F;:month&#x2F;:day&#x2F;:title&#x2F; 配置详见https:&#x2F;&#x2F;hexo.io&#x2F;zh-cn&#x2F;docs&#x2F;permalinks.html
+permalink: &#x2F;post&#x2F;:title.html
+permalink_defaults:
+pretty_urls:
+  trailing_index: true # Set to false to remove trailing &#39;index.html&#39; from permalinks
+  trailing_html: true  # Set to false to remove trailing &#39;.html&#39; from permalinks</code></pre>
+<p>但Aurora哪是一般的主题，它是由Vue构建的单页应用，地址栏输入的后缀（如&#x2F;post&#x2F;a）统统按请求参数处理，而一般的主题则认为它是一个静态页面的路径。如果托关于Cloudflare Pages上，这个问题可以忽略，但Vercel的需要自己配置，具体来说，需要在根目录创建<code>vercel.json</code>，内容如下：</p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json">&#123;
+    &quot;redirects&quot;: [
+        &#123; &quot;source&quot;: &quot;&#x2F;post&#x2F;:path*.html&quot;, &quot;destination&quot;: &quot;&#x2F;post&#x2F;:path*&quot; &#125;
+    ],
+    &quot;rewrites&quot;: [
+        &#123; &quot;source&quot;: &quot;&#x2F;:path*&quot;, &quot;destination&quot;: &quot;&#x2F;index.html&quot; &#125;
+    ]
+&#125;</code></pre>
+<p>第一条将所有的.html后缀重定向，这是为了兼容一般静态主题；<br>第二条将所有请求反向代理到根页面，是Aurora在Vercel上需要配置的；<br>两条规则其实是冲突的，但冲突时，Vercel选择靠前的遵守，用起来没问题。</p>
+<p>对于许多静态页面托管网站，都有Pretty URL的功能，将URL的.html后缀去掉，但Vercel叒没有，如果想用，得配置另一个<code>vercel.json</code>:</p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json">&#123;
+    &quot;rewrites&quot;: [
+        &#123; &quot;source&quot;: &quot;&#x2F;:path*&quot;,&quot;destination&quot;: &quot;&#x2F;:path*.html&quot;&#125;
+    ]
+&#125;</code></pre>
+<p>但是，Vercel的配置文件不支持重命名，只能有一个，所以Next主题的网站就只能托管于Netlify，Netlify对.html后缀就处理得很好。<br>最后再分享一下在两个网站得部署配置：<br><img src="https://cdn.saijun.eu.org/pic/2023/09/0b7fb307bea391b2e17d21a94314544b.png" alt="image.png"><br>这是在Vercel上部署Aurora的配置，其实是两条命令</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npm install hexo-plugin-aurora &amp;&amp; cp index_prod-00ee5e98.js node_modules&#x2F;hexo-theme-aurora&#x2F;source&#x2F;static&#x2F;js&#x2F;</code></pre>
+<p>第二条是用来覆盖我自定义的主题js；</p>
+<p>下图是在Netlify上的配置：<br><img src="https://cdn.saijun.eu.org/pic/2023/09/42e78625e505e51a195089a0752bd993.png" alt="image.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Tim
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://s.zair.top/post/%E5%8D%95%E9%85%8D%E7%BD%AE%E5%A4%9A%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2%E6%96%B9%E6%A1%88" title="单配置多主题博客方案">https://s.zair.top/post/单配置多主题博客方案</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+          <a target="_blank" class="social-link" href="https://t.me/tim_run">
+            <span class="icon">
+              <i class="fab fa-telegram"></i>
+            </span>
+
+            <span class="label">Telegram</span>
+          </a>
+      </div>
+
+      <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Vercel/" rel="tag"># Vercel</a>
+              <a href="/tags/Netlify/" rel="tag"># Netlify</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/home" rel="prev" title="首页导航">
+                  <i class="fa fa-angle-left"></i> 首页导航
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/baoyan" rel="next" title="保研经验帖">
+                  保研经验帖 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments"><div id="twikoo-comments"></div></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Tim</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" integrity="sha256-4mJNT2bMXxcc1GCJaxBmMPdmah5ji0Ldnd79DKd1hoM=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha256-AjM0J5XIbiB590BrznLEgZGLnOQWrt62s3BEq65Q/I0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" integrity="sha256-9cmf7tcLdXpKsPi/2AWE93PbZpTp4M4tqzFk+lWomjU=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="twikoo" type="application/json">{"enable":true,"visitor":true,"envId":"https://twiko.zair.top/.netlify/functions/twikoo","el":"#twikoo-comments"}</script>
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.twikoo.el)
+    .then(() => NexT.utils.getScript(
+      CONFIG.twikoo.jsUrl || 'https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js',
+      { condition: window.twikoo }
+    ))
+    .then(() => {
+      twikoo.init(CONFIG.twikoo);
+    });
+});
+</script>
+<style>
+.post-block, .comments {
+  overflow: visible;
+}
+.tk-owo-emotion {
+  display: inline-block;
+}
+</style>
+
+</body>
+</html>
